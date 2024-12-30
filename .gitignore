@@ -1,0 +1,6 @@
+# Ignorer les fichiers de log
+*.log
+# Ignorer les dossiers node_modules
+node_modules/
+
+*lock.json
