@@ -1,19 +1,22 @@
 const request = require('supertest');
 const express = require('express');
-const sequelize = require('../database');
-const User = require('../models/User');
-const userRoutes = require('../routes/router');
+const { PrismaClient } = require('@prisma/client');
+const {router} = require('../routes/router');
 
+const prisma = new PrismaClient();
 const app = express();
+
 app.use(express.json());
-app.use('/api', userRoutes);
+app.use('/api', router);
 
 beforeAll(async () => {
-  await sequelize.sync({ force: true });
+  // Nettoyer la base de données avant les tests
+  await prisma.user.deleteMany();
 });
 
 afterAll(async () => {
-  await sequelize.close();
+  // Fermer la connexion Prisma après les tests
+  await prisma.$disconnect();
 });
 
 describe('User Routes', () => {
@@ -26,7 +29,7 @@ describe('User Routes', () => {
         password: 'password123',
         city: 'Test City',
         tel: '1234567890',
-        birthday: '2000-01-01',
+        // birthday: '2000-01-01',
       });
     expect(response.status).toBe(201);
     expect(response.body.name).toBe('testuser');
@@ -39,13 +42,15 @@ describe('User Routes', () => {
   });
 
   it('should get a user by ID', async () => {
-    const user = await User.create({
-      name: 'testuser2',
-      email: 'testuser2@example.com',
-      password: 'password123',
-      city: 'Test City',
-      tel: '1234567890',
-      birthday: '2000-01-01',
+    const user = await prisma.user.create({
+      data: {
+        name: 'testuser2',
+        email: 'testuser2@example.com',
+        password: 'password123',
+        city: 'Test City',
+        tel: '1234567890',
+        birthday: new Date('2000-01-01'),
+      },
     });
     const response = await request(app).get(`/api/users/${user.id}`);
     expect(response.status).toBe(200);
@@ -53,13 +58,15 @@ describe('User Routes', () => {
   });
 
   it('should update a user', async () => {
-    const user = await User.create({
-      name: 'testuser3',
-      email: 'testuser3@example.com',
-      password: 'password123',
-      city: 'Test City',
-      tel: '1234567890',
-      birthday: '2000-01-01',
+    const user = await prisma.user.create({
+      data: {
+        name: 'testuser3',
+        email: 'testuser3@example.com',
+        password: 'password123',
+        city: 'Test City',
+        tel: '1234567890',
+        // birthday: new Date('2000-01-01'),
+      },
     });
     const response = await request(app)
       .put(`/api/users/${user.id}`)
@@ -69,20 +76,22 @@ describe('User Routes', () => {
         password: 'newpassword123',
         city: 'Updated City',
         tel: '0987654321',
-        birthday: '1999-01-01',
+        // birthday: new Date('2000-01-01'),
       });
     expect(response.status).toBe(200);
     expect(response.body.name).toBe('updateduser');
   });
 
   it('should delete a user', async () => {
-    const user = await User.create({
-      name: 'testuser4',
-      email: 'testuser4@example.com',
-      password: 'password123',
-      city: 'Test City',
-      tel: '1234567890',
-      birthday: '2000-01-01',
+    const user = await prisma.user.create({
+      data: {
+        name: 'testuser4',
+        email: 'testuser4@example.com',
+        password: 'password123',
+        city: 'Test City',
+        tel: '1234567890',
+        birthday: new Date('2000-01-01'),
+      },
     });
     const response = await request(app).delete(`/api/users/${user.id}`);
     expect(response.status).toBe(204);

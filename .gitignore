@@ -2,5 +2,5 @@
 *.log
 # Ignorer les dossiers node_modules
 node_modules/
-
+.env
 *lock.json

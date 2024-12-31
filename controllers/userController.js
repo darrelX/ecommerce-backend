@@ -1,9 +1,15 @@
-const User = require('../models/User');
+// const { prisma } = require('../index');
+const prisma = require('../middleware/middleware.js')
+
 
 const createUser = async (req, res) => {
   const { name, password, city, tel, birthday, email } = req.body;
+  // console.log(name, password, city, tel, birthday, email);
+  
   try {
-    const user = await User.create({ name, password, city, tel, birthday, email });
+    const user = await prisma.user.create({
+      data: { name: name, password: password, city: city, tel: tel, birthday: birthday, email: email },
+    });
     res.status(201).json(user);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -11,8 +17,9 @@ const createUser = async (req, res) => {
 };
 
 const getUsers = async (req, res) => {
+
   try {
-    const users = await User.findAll();
+    const users = await prisma.user.findMany(); // Equivalent à findAll dans Sequelize
     res.status(200).json(users);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -22,7 +29,7 @@ const getUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findByPk(id);
+    const user = await prisma.user.findUnique({ where: { id: parseInt(id) } }); // Equivalent à findByPk
     if (user) {
       res.status(200).json(user);
     } else {
@@ -34,40 +41,42 @@ const getUserById = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
+
   const { id } = req.params;
-  const { username, email, password, name, city, tel, birthday } = req.body;
+  const { name, password, city, tel, birthday, email } = req.body;
   try {
-    const user = await User.findByPk(id);
-    if (user) {
-      user.username = username;
-      user.email = email;
-      user.password = password;
-      user.name = name;
-      user.city = city;
-      user.tel = tel;
-      user.birthday = birthday;
-      await user.save();
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
+    console.log(id);
+    console.log(name, password, city, tel, birthday, email);
+
+    const user = await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: { name: name, password: password, city: city, tel: tel, birthday: birthday, email: email },
+    });
+    console.log(name, password, city, tel, birthday, email);
+
+    res.status(200).json(user);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    if (error.code === 'P2025') { // Prisma error for "record not found"
+      res.status(404).json({ error: 'User not found' });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 };
 
 const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findByPk(id);
-    if (user) {
-      await user.destroy();
-      res.status(204).send();
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
+    await prisma.user.delete({
+      where: { id: parseInt(id) },
+    });
+    res.status(204).send();
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    if (error.code === 'P2025') { // Prisma error for "record not found"
+      res.status(404).json({ error: 'User not found' });
+    } else {
+      res.status(400).json({ error: error.message });
+    }
   }
 };
 
