@@ -13,6 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 enum Status {
   Pending
   Completed
@@ -67,4 +68,3 @@ model ProductCategory{
   categoryName String
   Product Product[]
 }
-
