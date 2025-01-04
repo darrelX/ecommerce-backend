@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,58 +7,102 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum Status {
   Pending
   Completed
   Cancelled
 }
 
-
 model User {
-  id       Int      @id @default(autoincrement())
-  password String
-  email    String   @unique
-  name     String
-  city     String?  @default("Douala")
-  tel      String
-  birthday DateTime?
-  Order Order[]
+  id        Int       @id @default(autoincrement())
+  email     String    @unique @db.VarChar(200)
+  password  String    @db.VarChar(100)
+  name      String    @db.VarChar(100)
+  city      String?   @default("Douala")
+  tel       String    @db.VarChar(20)
+  birthday  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  
+  
+  // Relations
+  orders    Order[]
+  carts     Cart[]
 }
 
 model Product {
-  id          Int     @id @default(autoincrement())
-  name        String
-  price       Decimal
-  description String
-  image       String?
-  productCategory ProductCategory @relation(fields: [category], references: [id])
-  category    Int
-  OrderDetail OrderDetail[]
+  id              Int             @id @default(autoincrement())
+  name            String          @db.VarChar(150)
+  price           Decimal         @db.Decimal(10, 2)
+  description     String          @db.Text
+  image           String?         @db.VarChar(200)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relations
+  category        ProductCategory @relation(fields: [categoryId], references: [id])
+  categoryId      Int
+  orderDetails    OrderDetail[]
+  cartItems       CartItem[]
+}
+
+model ProductCategory {
+  id           Int       @id @default(autoincrement())
+  categoryName String    @db.VarChar(100)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  products     Product[]
 }
 
 model Order {
-  id Int @id @default(autoincrement())
-  user User @relation(fields: [userId], references: [id])
-  userId Int
-  amount Decimal
-  status Status  @default(Pending)
-  OrderDetail OrderDetail[]
+  id          Int           @id @default(autoincrement())
+  amount      Decimal        @db.Decimal(10, 2)
+  status      Status         @default(Pending)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
+  // Relations
+  user        User           @relation(fields: [userId], references: [id])
+  userId      Int
+  orderDetails OrderDetail[]
 }
 
-model OrderDetail{
-  id Int @id @default(autoincrement())
-  order Order @relation(fields: [orderId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+model OrderDetail {
+  id          Int      @id @default(autoincrement())
+  quantity    Int
+  price       Decimal  @db.Decimal(10, 2)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  order       Order    @relation(fields: [orderId], references: [id])
+  orderId     Int
+  product     Product  @relation(fields: [productId], references: [id])
+  productId   Int
+}
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id])
+  cartItems CartItem[]
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  total     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  cartId    Int
+  product   Product  @relation(fields: [productId], references: [id])
   productId Int
-  orderId Int
-  quantity Int
-  price Decimal
-}
-
-model ProductCategory{
-  id Int @id @default(autoincrement())
-  categoryName String
-  Product Product[]
 }

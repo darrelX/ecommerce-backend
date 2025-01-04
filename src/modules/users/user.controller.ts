@@ -1,11 +1,16 @@
-import { Controller, Get, Query, Param, Post, Delete, Put, Body } from '@nestjs/common';
+import { Controller, Get, Query, Param, Post, Delete, Put, Body, BadRequestException, UseFilters, HttpException, HttpStatus } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
 import { Prisma } from '@prisma/client';
+import { CreateUserDto } from './dto/create-user.dto';
+import { plainToClass } from 'class-transformer';
+import { validateOrReject, ValidationError } from 'class-validator';
+import { ValidationExceptionFilter } from 'src/filters/validation-exception.filter';
 
+@UseFilters(ValidationExceptionFilter)
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Get()
   async getUsers(
@@ -24,16 +29,17 @@ export class UserController {
       orderBy: orderBy ? JSON.parse(orderBy) : undefined,
     };
 
-    
+    console.log(params.where);
+
     const users = await this.userService.users(params);
     const total = await this.userService.countUsers(params.where);
     return {
-      total : total,
-       page: Number(page),
-       data : users,
+      total: total,
+      page: Number(page),
+      data: users,
     };
   }
-  
+
   @Get(':id')
   async getUser(@Param('id') id: string): Promise<User | null> {
     return this.userService.user({ id: Number(id) });
@@ -52,7 +58,46 @@ export class UserController {
 
   @Post('')
   async createUser(@Body() userData: Prisma.UserCreateInput): Promise<User> {
-    return this.userService.createUser(userData);
+    try {
+      const userDto = plainToClass(CreateUserDto, userData);
+      await validateOrReject(userDto);
+      // const userCreateInput: Prisma.UserCreateInput = {
+      //   name: userDto.name,
+      //   email: userDto.email,
+      //   tel: userDto.tel,
+      //   password: userDto.password,
+      //   updatedAt: new Date(),
+      //   // Ajoutez d'autres propriétés nécessaires ici
+      // };
+      return this.userService.createUser(userDto);
+
+    } catch (error) {
+      // console.error(error);
+      // if (Array.isArray(error)) {
+      //   const validationErrors = error.map((err: ValidationError) => ({
+      //     field: err.property,
+      //     value: err.value,
+      //     errors: Object.values(err.constraints || {}),
+      //   }));
+
+      //   console.log(validationErrors);
+        
+      //   throw new HttpException(
+      //     {
+      //       statusCode: HttpStatus.BAD_REQUEST,
+      //       message: 'Erreur de validation.',
+      //       error: validationErrors,
+      //     },
+      //     HttpStatus.BAD_REQUEST,
+      //   );
+      // }
+
+      throw new HttpException({
+        statusCode: 500,
+        // message: 'Email already used',
+        error: error,
+      }, 404);
+    }
   }
 
   @Delete(':id')
