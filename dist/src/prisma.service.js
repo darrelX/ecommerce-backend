@@ -12,11 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
-const orderdetail_middleware_1 = require("./middleware/order/orderdetail.middleware");
 let PrismaService = class PrismaService extends client_1.PrismaClient {
     constructor() {
         super();
-        this.$use(orderdetail_middleware_1.orderDetailMiddleware);
         this.$use(async (params, next) => {
             console.log(`[Prisma Middleware] Model: ${params.model}, Action: ${params.action}`);
             return next(params);

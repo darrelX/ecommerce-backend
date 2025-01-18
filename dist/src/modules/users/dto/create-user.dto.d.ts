@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { $Enums, User } from '@prisma/client';
 export declare class CreateUserDto implements User {
     id: number;
     name: string;
@@ -6,6 +6,7 @@ export declare class CreateUserDto implements User {
     city: string;
     tel: string;
     password: string;
+    role: $Enums.Role;
     createdAt: Date;
     updatedAt: Date;
     birthday: Date;

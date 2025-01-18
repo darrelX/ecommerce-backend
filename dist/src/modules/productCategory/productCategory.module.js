@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductCategoryModule = void 0;
 const common_1 = require("@nestjs/common");
 const productCategory_service_1 = require("./productCategory.service");
-const productCategory_controller_1 = require("./productCategory.controller");
+const product_category_controller_1 = require("./product-category.controller");
 const prisma_service_1 = require("../../prisma.service");
 let ProductCategoryModule = class ProductCategoryModule {
 };
@@ -17,7 +17,7 @@ exports.ProductCategoryModule = ProductCategoryModule;
 exports.ProductCategoryModule = ProductCategoryModule = __decorate([
     (0, common_1.Module)({
         imports: [],
-        controllers: [productCategory_controller_1.ProductCategoryController],
+        controllers: [product_category_controller_1.ProductCategoryController],
         providers: [productCategory_service_1.ProductCategoryService, prisma_service_1.PrismaService],
     })
 ], ProductCategoryModule);

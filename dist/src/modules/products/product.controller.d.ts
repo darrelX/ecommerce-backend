@@ -3,7 +3,7 @@ import { Product, Prisma } from '@prisma/client';
 export declare class ProductController {
     private readonly productService;
     constructor(productService: ProductService);
-    getproducts(skip?: string, take?: string, cursor?: string, where?: string, orderBy?: string, page?: string): Promise<{
+    getproducts(skip?: string, take?: string, cursor?: string, where?: string, sortbyOrder?: 'asc' | 'desc', page?: string): Promise<{
         total: number;
         page: number;
         data: Product[];

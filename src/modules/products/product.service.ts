@@ -2,6 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
 import { Product, Prisma } from '@prisma/client';
+import { ApiQuery } from '@nestjs/swagger';
 
 @Injectable()
 export class ProductService {
@@ -29,6 +30,11 @@ export class ProductService {
       cursor,
       where,
       orderBy,
+      include: {
+        category: true,
+        orderDetails: true,
+        
+      }
     });
   }
 

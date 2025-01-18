@@ -8,7 +8,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
     super();
     // Ajouter le middleware `orderDetailMiddleware`
-    this.$use(orderDetailMiddleware);
+    // this.$use(orderDetailMiddleware);
 
     // Ajouter un middleware de journalisation
     this.$use(async (params, next) => {

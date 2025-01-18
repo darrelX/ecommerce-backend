@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client';
 export declare class OrderDetailController {
     private readonly orderDetailService;
     constructor(orderDetailService: OrderDetailService);
-    getOrderDetail(skip?: string, take?: string, cursor?: string, where?: string, orderBy?: string, page?: string): Promise<{
+    getOrderDetail(skip?: string, take?: string, cursor?: string, where?: string, sortby_order?: string, page?: string): Promise<{
         total: number;
         page: number;
         data: OrderDetail[];

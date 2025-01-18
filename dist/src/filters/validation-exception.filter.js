@@ -16,8 +16,8 @@ let ValidationExceptionFilter = class ValidationExceptionFilter {
         const request = ctx.getRequest();
         const status = exception.getStatus();
         const exceptionResponse = exception.getResponse();
-        if (exceptionResponse.error[0] instanceof class_validator_1.ValidationError) {
-            console.log('Validation error');
+        if (exceptionResponse.error != undefined &&
+            exceptionResponse.error[0] instanceof class_validator_1.ValidationError) {
             const validationErrors = exceptionResponse.error.map((err) => ({
                 field: err.property,
                 value: err.value,

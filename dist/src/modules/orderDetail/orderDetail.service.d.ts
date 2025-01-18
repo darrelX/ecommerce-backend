@@ -11,8 +11,8 @@ export declare class OrderDetailService {
         where?: Prisma.OrderDetailWhereInput;
         orderBy?: Prisma.OrderDetailOrderByWithRelationInput;
     }): Promise<OrderDetail[]>;
-    createOrderDetail(orderId: number, productId: number, quantity: number): Promise<OrderDetail>;
-    updateOrderTotal(orderId: number): Promise<void>;
+    createOrderDetail(order_id: number, product_id: number, quantity: number): Promise<OrderDetail>;
+    updateOrderTotal(order_id: number): Promise<void>;
     updateOrderDetail(params: {
         where: Prisma.OrderDetailWhereUniqueInput;
         data: Prisma.OrderDetailUpdateInput;

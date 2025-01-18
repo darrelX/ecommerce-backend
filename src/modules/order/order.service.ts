@@ -2,10 +2,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
 import { Order, Prisma } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class OrderService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async order(
     orderWhereUniqueInput: Prisma.OrderWhereUniqueInput,
@@ -32,9 +33,75 @@ export class OrderService {
     });
   }
 
-  async createOrder(data: Prisma.OrderCreateInput): Promise<Order> {
+  async createOrderWithProducts(
+    user_id: number,
+    products: Array<{ product_id: number; quantity: number; price: number }>,
+  ) {
+    return this.prisma.$transaction(async (prisma) => {
+      
+      
+      // Récupérer tous les IDs des produits mentionnés dans la requête
+      const product_ids = products.map((p) => p.product_id);
+
+  
+      // Vérifier que tous les produits existent
+      const existingProducts = await prisma.product.findMany({
+        where: { id: { in: product_ids } },
+        select: { id: true },
+      });
+  
+      const existingProductIds = existingProducts.map((p) => p.id);
+  
+      // Identifier les IDs invalides
+      const invalidProductIds = product_ids.filter((id) => !existingProductIds.includes(id));
+  
+      if (invalidProductIds.length > 0) {
+        
+        throw new Error(
+          `Invalid product IDs: ${invalidProductIds.join(', ')}`,
+        );
+      }
+  
+      // Calculer le montant total de la commande
+      const totalAmount = products.reduce((sum, p) => sum + p.quantity *  p.price, 0);
+  
+      // Créer la commande
+      const order = await prisma.order.create({
+        data: {
+          user_id,
+          status: 'Pending',
+          amount: totalAmount,
+        },
+      });
+  
+      // Associer les produits à la commande
+      const orderDetails : Prisma.OrderDetailCreateManyInput[] = products.map((p) => ({
+        order_id: order.id,
+        product_id: p.product_id,
+        quantity: p.quantity,
+        price: p.price,
+      }));
+  
+      await prisma.orderDetail.createMany({
+        data: orderDetails,
+      });
+  
+      return order;
+    });
+  }
+  
+
+  async createOrder(data: Prisma.OrderCreateInput, orderDetail: Prisma.OrderDetailCreateInput[]): Promise<Order> {
     return this.prisma.order.create({
-      data,
+      data: {
+        ...data,
+        orderDetails: {
+          create: orderDetail
+        }
+      },
+      include: {
+        orderDetails: true
+      }
     });
   }
 

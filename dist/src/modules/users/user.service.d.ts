@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 export declare class UserService {
     private prisma;
     constructor(prisma: PrismaService);
-    user(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | null>;
+    user(userWhereUniqueInput: Prisma.UserWhereUniqueInput): Promise<User | {}>;
     users(params: {
         skip?: number;
         take?: number;
@@ -13,6 +13,8 @@ export declare class UserService {
         orderBy?: Prisma.UserOrderByWithRelationInput;
     }): Promise<User[]>;
     createUser(createUserDto: CreateUserDto): Promise<User>;
+    findById(id: number): Promise<User>;
+    findByEmail(email: string): Promise<User>;
     updateUser(params: {
         where: Prisma.UserWhereUniqueInput;
         data: Prisma.UserUpdateInput;

@@ -31,32 +31,32 @@ let OrderDetailService = class OrderDetailService {
             orderBy,
         });
     }
-    async createOrderDetail(orderId, productId, quantity) {
+    async createOrderDetail(order_id, product_id, quantity) {
         const product = await this.prisma.product.findUnique({
-            where: { id: productId },
+            where: { id: product_id },
         });
         if (!product) {
             throw new Error('Produit introuvable');
         }
         const orderDetail = await this.prisma.orderDetail.create({
             data: {
-                orderId,
-                productId,
+                order_id,
+                product_id,
                 quantity,
                 price: product.price,
             },
         });
         return orderDetail;
     }
-    async updateOrderTotal(orderId) {
+    async updateOrderTotal(order_id) {
         const orderDetails = await this.prisma.orderDetail.findMany({
-            where: { orderId },
+            where: { order_id },
         });
         const totalAmount = orderDetails.reduce((sum, detail) => {
             return sum + Number(detail.price) * detail.quantity;
         }, 0);
         await this.prisma.order.update({
-            where: { id: orderId },
+            where: { id: order_id },
             data: { amount: totalAmount },
         });
     }

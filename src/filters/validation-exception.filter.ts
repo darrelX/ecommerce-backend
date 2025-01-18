@@ -18,11 +18,9 @@ export class ValidationExceptionFilter implements ExceptionFilter {
         const exceptionResponse: any = exception.getResponse();
 
         // Vérifier si c'est une erreur de validation
-        if (
+        if (exceptionResponse.error != undefined &&
             exceptionResponse.error[0] instanceof ValidationError
         ) {
-            console.log('Validation error');
-            
             const validationErrors = exceptionResponse.error.map((err: ValidationError) => ({
                 field: err.property,
                 value: err.value,

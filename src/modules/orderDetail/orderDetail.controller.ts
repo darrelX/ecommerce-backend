@@ -3,18 +3,70 @@ import { Controller, Get, Query, Param, Post, Delete, Put, Body } from '@nestjs/
 import { OrderDetailService } from './orderDetail.service';
 import { OrderDetail } from '@prisma/client';
 import { Prisma } from '@prisma/client';
+import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 @Controller('orderDetail')
 export class OrderDetailController {
   constructor(private readonly orderDetailService: OrderDetailService) {}
 
   @Get()
+    @ApiOperation({ summary: 'Get orderDetail cateory' })
+    @ApiQuery({ name: 'skip', required: false, type: String, example: '0' })
+    @ApiQuery({ name: 'take', required: false, type: String, example: '10' })
+    @ApiQuery({ name: 'cursor', required: false, type: String, example: '' })
+    @ApiQuery({ name: 'where', required: false, type: String, example: '' })
+    @ApiQuery({ name: 'sort', required: false, type: String, example: '' })
+    @ApiQuery({
+      name: 'sortby_order',
+      required: false,
+      enum: ['asc', 'desc'],
+      example: 'asc'
+    })
+    @ApiQuery({ name: 'page', required: false, type: String, example: '1' })
+    @ApiResponse({
+      status: 200, description: 'List of users returned successfully.',
+      schema: {
+        example: {
+          "total": 1,
+          "page": 1,
+          "data": [
+            {
+              "id": 2,
+              "category_name": "@gmail.com",
+              "description": "description",
+              "createdAt": "2025-01-05T15:54:59.837Z",
+              "updatedAt": "2025-01-05T15:54:59.835Z"
+            }
+          ]
+        }
+      },
+    })
+    @ApiResponse({
+      status: 400,
+      description: 'Bad Request.',
+      schema: {
+        example: {
+          statusCode: 400,
+          message: 'Invalid input data',
+        },
+      },
+    })
+    @ApiResponse({
+      status: 500,
+      description: 'Internal Server Error.',
+      schema: {
+        example: {
+          statusCode: 500,
+          message: 'Internal server error',
+        },
+      },
+    })
   async getOrderDetail(
     @Query('skip') skip?: string,
     @Query('take') take?: string,
     @Query('cursor') cursor?: string,
     @Query('where') where?: string,
-    @Query('orderBy') orderBy?: string,
+    @Query('sortby_order') sortby_order?: string,
     @Query('page') page: string = '1'
   ): Promise<{ total: number, page: number, data: OrderDetail[] }> {
     const params = {
@@ -22,7 +74,7 @@ export class OrderDetailController {
       take: take ? Number(take) : undefined,
       cursor: cursor ? JSON.parse(cursor) : undefined,
       where: where ? JSON.parse(where) : undefined,
-      orderBy: orderBy ? JSON.parse(orderBy) : undefined,
+      sortby_order: sortby_order ? JSON.parse(sortby_order) : undefined,
     };
 
     

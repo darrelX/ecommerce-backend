@@ -12,13 +12,13 @@ export const orderDetailMiddleware: Prisma.Middleware = async (params, next) => 
     const data : OrderDetail = params.args.data;
 
     // Vérifier que les données sont valides
-    if (!data.productId) {
+    if (!data.product_id) {
       throw new Error('Le champ productId est requis pour créer un OrderDetail.');
     }
 
     // Récupérer le produit correspondant
     const product : Product = await prisma.product.findUnique({
-      where: { id: data.productId },
+      where: { id: data.product_id },
     });
 
     if (!product) {

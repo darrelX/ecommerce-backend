@@ -38,10 +38,10 @@ export class OrderDetailService {
   //   });
   // }
 
-  async createOrderDetail(orderId: number, productId: number, quantity: number): Promise<OrderDetail> {
+  async createOrderDetail(order_id: number, product_id: number, quantity: number): Promise<OrderDetail> {
     // Vérifie si le produit existe
     const product: Product | null = await this.prisma.product.findUnique({
-      where: { id: productId },
+      where: { id: product_id },
     });
 
     if (!product) {
@@ -51,8 +51,8 @@ export class OrderDetailService {
     // Créer un détail de commande
     const orderDetail: OrderDetail = await this.prisma.orderDetail.create({
       data: {
-        orderId,
-        productId,
+        order_id,
+        product_id,
         quantity,
         price: product.price, // Prix unitaire du produit
       },
@@ -61,10 +61,10 @@ export class OrderDetailService {
     return orderDetail;
   }
 
-  async updateOrderTotal(orderId: number): Promise<void> {
+  async updateOrderTotal(order_id: number): Promise<void> {
     // Récupérer tous les détails de la commande
     const orderDetails: OrderDetail[] = await this.prisma.orderDetail.findMany({
-      where: { orderId },
+      where: { order_id },
     });
 
     // Calculer le montant total
@@ -74,7 +74,7 @@ export class OrderDetailService {
 
     // Mettre à jour la commande
     await this.prisma.order.update({
-      where: { id: orderId },
+      where: { id: order_id },
       data: { amount: totalAmount },
     });
 

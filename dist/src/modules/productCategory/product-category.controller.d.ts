@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client';
 export declare class ProductCategoryController {
     private readonly productCategoryService;
     constructor(productCategoryService: ProductCategoryService);
-    getProductCategory(skip?: string, take?: string, cursor?: string, where?: string, orderBy?: string, page?: string): Promise<{
+    getProductCategory(skip?: string, take?: string, cursor?: string, where?: string, sortby_order?: string, page?: string): Promise<{
         total: number;
         page: number;
         data: ProductCategory[];

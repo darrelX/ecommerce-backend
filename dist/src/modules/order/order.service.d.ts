@@ -11,7 +11,19 @@ export declare class OrderService {
         where?: Prisma.OrderWhereInput;
         orderBy?: Prisma.OrderOrderByWithRelationInput;
     }): Promise<Order[]>;
-    createOrder(data: Prisma.OrderCreateInput): Promise<Order>;
+    createOrderWithProducts(user_id: number, products: Array<{
+        product_id: number;
+        quantity: number;
+        price: number;
+    }>): Promise<{
+        id: number;
+        amount: Prisma.Decimal;
+        status: import(".prisma/client").$Enums.Status;
+        createdAt: Date;
+        updatedAt: Date;
+        user_id: number;
+    }>;
+    createOrder(data: Prisma.OrderCreateInput, orderDetail: Prisma.OrderDetailCreateInput[]): Promise<Order>;
     updateOrder(params: {
         where: Prisma.OrderWhereUniqueInput;
         data: Prisma.OrderUpdateInput;

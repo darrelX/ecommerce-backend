@@ -29,6 +29,10 @@ let ProductService = class ProductService {
             cursor,
             where,
             orderBy,
+            include: {
+                category: true,
+                orderDetails: true,
+            }
         });
     }
     async createProduct(data) {

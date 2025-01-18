@@ -1,1 +1,3 @@
-export declare function generateHash(data: string, algorithm?: string): string;
+export declare const hashConfig: {
+    saltRounds: number;
+};
